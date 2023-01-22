@@ -1,0 +1,14 @@
+- name: configure client
+  hosts: client
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+
+  tasks:
+
+    - name: fetch myscript.sh log file
+      fetch:
+        src: "/var/log/myscript.log"
+        dest: "../myscript.log"
+        flat: true
