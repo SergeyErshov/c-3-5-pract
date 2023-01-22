@@ -1,0 +1,68 @@
+- name: configure client
+  hosts: client
+  vars:
+    - logsrv: 10.128.0.21
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+
+  tasks:
+
+    - name: istalling jq
+      package:
+        name: jq
+        state: present
+        update_cache: true
+
+    - name: installing nginx
+      package:
+        name: nginx
+        state: present
+
+    - name: configure nginx error_log
+      lineinfile:
+        path: "/etc/nginx/nginx.conf"
+        search_string: "error_log /var/log/nginx/error.log;"
+        line: "error_log syslog:server={{ logsrv }} debug;"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: configure nginx access_log
+      lineinfile:
+        path: "/etc/nginx/nginx.conf"
+        search_string: "access_log /var/log/nginx/access.log;"
+        line: "access_log syslog:server={{ logsrv }},facility=local7,tag=nginx,severity=info combined;"
+        owner: root
+        group: root
+        mode: "0644"
+    
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
+
+    - name: create log file for myscript.sh 
+      file:
+        path: "/var/log/myscript.log"
+        state: touch
+        owner: root
+        group: root
+        mode: "0766"
+
+    - name: copy script to client
+      copy:
+        src: "../myscript.sh"
+        dest: "/home/esm/myscript.sh"
+        owner: esm
+        group: esm
+        mode: '0764'
+
+
+
+
+
+
+
+
