@@ -1,0 +1,27 @@
+- name: configure logsrv
+  hosts: logsrv
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+
+  tasks:
+
+    - name: install rsyslog
+      package:
+        name: rsyslog
+        state: present
+        update_cache: true
+
+    - name: disable firewall
+      systemd:
+        name: ufw
+        state: stopped
+        enabled: false
+
+    - name: fetch rsyslog configure
+      fetch:
+        src: "/etc/rsyslog.conf"
+        dest: "../configs/rsyslog/"
+        flat: true
+  
