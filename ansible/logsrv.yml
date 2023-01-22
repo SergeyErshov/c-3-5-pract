@@ -24,4 +24,20 @@
         src: "/etc/rsyslog.conf"
         dest: "../configs/rsyslog/"
         flat: true
+
+    - name: push syslog_nginx.conf to logserver
+      copy:
+        src: "../configs/rsyslog/syslog_nginx.conf"
+        dest: "/etc/rsyslog.d/"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: restart rsyslog
+      systemd:
+        name: rsyslog
+        state: restarted
+        enabled: true
+
+
   
